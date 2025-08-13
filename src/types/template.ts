@@ -14,6 +14,7 @@ export interface VariableConfig {
   currentValue: unknown;
   options?: unknown[]; // radio/selectの選択肢
   dateFormat?: string; // 日付フォーマット（日付タイプの場合）
+  naturalLanguageInput?: string; // 自然言語の日付入力（"Today", "Tomorrow"など）
 }
 
 export type UIType = 'text' | 'number' | 'radio' | 'select' | 'checkbox' | 'date';

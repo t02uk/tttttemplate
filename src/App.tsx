@@ -55,11 +55,10 @@ function App() {
     const initialValues: { [key: string]: unknown } = {};
     template.variables.forEach((variable) => {
       if (variable.uiType === "date" && variable.defaultFunction) {
-        // For date variables, re-evaluate the default function to get current value
-        const result = evaluateJavaScript(variable.defaultFunction);
-        if (!result.error && typeof result.value === "string") {
+        // For date variables with natural language input, re-evaluate it
+        if (variable.naturalLanguageInput) {
           const dateResult = processNaturalDate(
-            result.value,
+            variable.naturalLanguageInput,
             variable.dateFormat
           );
           if (dateResult.error === null) {
@@ -68,7 +67,21 @@ function App() {
             initialValues[variable.name] = variable.currentValue;
           }
         } else {
-          initialValues[variable.name] = variable.currentValue;
+          // For date variables without natural language, re-evaluate the default function
+          const result = evaluateJavaScript(variable.defaultFunction);
+          if (!result.error && typeof result.value === "string") {
+            const dateResult = processNaturalDate(
+              result.value,
+              variable.dateFormat
+            );
+            if (dateResult.error === null) {
+              initialValues[variable.name] = dateResult.value;
+            } else {
+              initialValues[variable.name] = variable.currentValue;
+            }
+          } else {
+            initialValues[variable.name] = variable.currentValue;
+          }
         }
       } else {
         initialValues[variable.name] = variable.currentValue;

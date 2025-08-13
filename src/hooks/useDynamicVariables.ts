@@ -31,11 +31,20 @@ export function useDynamicVariables(templateContent: string) {
     }
   }, []);
 
-  const updateVariableValue = useCallback((variableName: string, value: unknown) => {
+  const updateVariableValue = useCallback((variableName: string, value: unknown, naturalLanguageInput?: string) => {
     setVariableValues(prev => ({
       ...prev,
       [variableName]: value
     }));
+    
+    // If natural language input is provided, update the variable config
+    if (naturalLanguageInput !== undefined) {
+      setVariables(prev => prev.map(v => 
+        v.name === variableName 
+          ? { ...v, naturalLanguageInput }
+          : v
+      ));
+    }
   }, []);
 
   const refreshVariableDefaults = useCallback(() => {

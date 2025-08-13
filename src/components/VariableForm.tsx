@@ -7,7 +7,7 @@ import { processNaturalDate, formatDate } from '../utils/dateProcessor';
 interface VariableFormProps {
   variables: VariableConfig[];
   variableValues: VariableValue;
-  onVariableChange: (name: string, value: unknown) => void;
+  onVariableChange: (name: string, value: unknown, naturalLanguageInput?: string) => void;
   onConfigureVariable: (name: string) => void;
 }
 
@@ -20,17 +20,21 @@ function DateInput({
 }: {
   variable: VariableConfig;
   value: unknown;
-  onVariableChange: (name: string, value: unknown) => void;
+  onVariableChange: (name: string, value: unknown, naturalLanguageInput?: string) => void;
   convertDayjsToDatePickerFormat: (format?: string) => string;
 }) {
-  const [naturalInput, setNaturalInput] = useState(String(value || ''));
+  const [naturalInput, setNaturalInput] = useState(variable.naturalLanguageInput || String(value || ''));
   const [parseError, setParseError] = useState<string | null>(null);
   const [showPicker, setShowPicker] = useState(false);
 
-  // Update naturalInput when value changes
+  // Update naturalInput when value changes (only if no natural language input is saved)
   React.useEffect(() => {
-    setNaturalInput(String(value || ''));
-  }, [value]);
+    if (variable.naturalLanguageInput) {
+      setNaturalInput(variable.naturalLanguageInput);
+    } else {
+      setNaturalInput(String(value || ''));
+    }
+  }, [value, variable.naturalLanguageInput]);
 
   const handleNaturalInputChange = (input: string) => {
     setNaturalInput(input);
@@ -45,7 +49,7 @@ function DateInput({
       setParseError(result.error);
     } else {
       setParseError(null);
-      onVariableChange(variable.name, result.value);
+      onVariableChange(variable.name, result.value, input);
     }
   };
 
