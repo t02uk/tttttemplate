@@ -100,6 +100,8 @@ export function VariableConfigDialog({
       currentValue: processedValue,
       options: newOptions,
       dateFormat: newUIType === 'date' ? dateFormat : undefined,
+      // Preserve natural language input for date types
+      naturalLanguageInput: (newUIType === 'date' && typeof result.value === 'string') ? result.value : undefined,
     };
     
     console.log('Saving variable config:', {
