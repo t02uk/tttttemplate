@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import type { Template, VariableConfig } from "./types/template";
 import { TemplateList } from "./components/TemplateList";
@@ -33,16 +33,21 @@ function App() {
     null
   );
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false);
+  const [savedTemplateState, setSavedTemplateState] = useState<Template | null>(null);
+  const [showSaved, setShowSaved] = useState(false);
+  const [viewMode, setViewMode] = useState<'four-pane' | 'two-pane'>('four-pane');
 
   const handleNewTemplate = () => {
     const newTemplate: Template = {
       id: Date.now().toString(),
-      name: "New Template",
+      name: `Template ${templates.length + 1}`,
       content: "",
       variables: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+    // Immediately save the new template to the list
+    saveTemplate(newTemplate);
     setCurrentTemplate(newTemplate);
     setVariables([]);
     setVariableValues({});
@@ -50,6 +55,7 @@ function App() {
 
   const handleSelectTemplate = (template: Template) => {
     setCurrentTemplate(template);
+    setSavedTemplateState(template);
     setVariables(template.variables);
 
     const initialValues: { [key: string]: unknown } = {};
@@ -104,8 +110,13 @@ function App() {
         })),
         updatedAt: new Date(),
       };
-      saveTemplate(updatedTemplate);
-      setCurrentTemplate(updatedTemplate);
+      const saved = saveTemplate(updatedTemplate);
+      if (saved) {
+        setCurrentTemplate(updatedTemplate);
+        setSavedTemplateState(updatedTemplate);
+        setShowSaved(true);
+        setTimeout(() => setShowSaved(false), 2000);
+      }
     }
   };
 
@@ -121,20 +132,61 @@ function App() {
     updateVariableConfig(config.name, config);
   };
 
+  const hasUnsavedChanges = () => {
+    if (!currentTemplate || !savedTemplateState) return false;
+    return (
+      currentTemplate.name !== savedTemplateState.name ||
+      currentTemplate.content !== savedTemplateState.content ||
+      JSON.stringify(variables) !== JSON.stringify(savedTemplateState.variables)
+    );
+  };
+
+  useEffect(() => {
+    if (currentTemplate && savedTemplateState?.id === currentTemplate.id) {
+      const savedVariables = savedTemplateState.variables || [];
+      const currentVariables = variables.map((v) => ({
+        ...v,
+        currentValue: variableValues[v.name] || v.currentValue,
+      }));
+      if (JSON.stringify(currentVariables) !== JSON.stringify(savedVariables)) {
+        setShowSaved(false);
+      }
+    }
+  }, [variables, variableValues, currentTemplate, savedTemplateState]);
+
   return (
     <div className="app">
       <div className="app-header">
         <h1>tttttemplate</h1>
         <div className="app-actions">
-          <button onClick={handleSaveTemplate} disabled={!currentTemplate}>
-            Save Template
+          <div className="view-mode-toggle">
+            <button 
+              className={`mode-btn ${viewMode === 'four-pane' ? 'active' : ''}`}
+              onClick={() => setViewMode('four-pane')}
+            >
+              4 Panes
+            </button>
+            <button 
+              className={`mode-btn ${viewMode === 'two-pane' ? 'active' : ''}`}
+              onClick={() => setViewMode('two-pane')}
+            >
+              2 Panes
+            </button>
+          </div>
+          <button 
+            onClick={handleSaveTemplate} 
+            disabled={!currentTemplate || !hasUnsavedChanges()}
+            className={currentTemplate && hasUnsavedChanges() ? 'save-btn' : ''}
+            title={currentTemplate ? `This will update the template "${currentTemplate.name}"` : ''}
+          >
+            {showSaved ? 'Saved' : currentTemplate ? `Save to "${currentTemplate.name}"` : 'Save Template'}
           </button>
         </div>
       </div>
 
       <div className="app-content">
-        <div className="app-grid">
-          <div className="panel template-list-panel">
+        <div className={`app-grid ${viewMode}`}>
+          <div className={`panel template-list-panel ${viewMode === 'two-pane' ? 'hidden' : ''}`}>
             <TemplateList
               templates={templates}
               currentTemplate={currentTemplate}
@@ -142,10 +194,14 @@ function App() {
               onDeleteTemplate={deleteTemplate}
               onNewTemplate={handleNewTemplate}
               onUpdateTemplate={saveTemplate}
+              onMaximizeTemplate={(template) => {
+                handleSelectTemplate(template);
+                setViewMode('two-pane');
+              }}
             />
           </div>
 
-          <div className="panel template-editor-panel">
+          <div className={`panel template-editor-panel ${viewMode === 'two-pane' ? 'hidden' : ''}`}>
             <TemplateEditor
               template={currentTemplate}
               onTemplateChange={handleTemplateChange}

@@ -24,7 +24,8 @@
 
 .app-actions {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 1rem;
 }
 
 .app-actions button {
@@ -45,6 +46,18 @@
   cursor: not-allowed;
 }
 
+.save-btn {
+  background-color: #007bff !important;
+  color: white !important;
+  border-color: #007bff !important;
+  font-weight: 500;
+}
+
+.save-btn:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+}
+
 .app-content {
   flex: 1;
   overflow: hidden;
@@ -57,6 +70,14 @@
   height: 100%;
   gap: 1px;
   background-color: #ddd;
+  transition: all 0.4s ease;
+}
+
+/* 2-pane mode layout */
+.app-grid.two-pane {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr !important;
+  height: 100%;
 }
 
 .panel {
@@ -64,6 +85,50 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: all 0.4s ease, opacity 0.3s ease;
+}
+
+/* Hide panels in 2-pane mode with animation */
+.panel.hidden {
+  display: none;
+}
+
+/* In 2-pane mode, ensure Variables and Preview take full available height */
+.app-grid.two-pane .variable-form-panel,
+.app-grid.two-pane .template-preview-panel {
+  height: 100%;
+  min-height: 100%;
+}
+
+/* View Mode Toggle */
+.view-mode-toggle {
+  display: flex;
+  gap: 2px;
+  background-color: #e9ecef;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.mode-btn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  background-color: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  color: #495057;
+}
+
+.mode-btn.active {
+  background-color: #fff;
+  color: #007bff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* Template List Panel */
@@ -113,10 +178,10 @@
 }
 
 .template-item {
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid #eee;
   border-radius: 4px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -135,7 +200,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
 .template-item-header h4 {
@@ -143,6 +207,7 @@
   font-size: 1rem;
   cursor: pointer;
   transition: color 0.2s;
+  flex: 1;
 }
 
 .template-item-header h4:hover {
@@ -161,18 +226,45 @@
   max-width: 200px;
 }
 
+.template-item-actions {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.maximize-btn,
 .delete-btn {
   background: none;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #dc3545;
   padding: 0.25rem;
   border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.maximize-btn {
+  color: #007bff;
+}
+
+.delete-btn {
+  color: #dc3545;
+}
+
+.template-item:hover .maximize-btn,
+.template-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.maximize-btn:hover {
+  background-color: #e7f2ff;
+  transform: scale(1.1);
 }
 
 .delete-btn:hover {
   background-color: #f8d7da;
+  transform: scale(1.1);
 }
 
 .template-item-meta {
@@ -190,9 +282,6 @@
 }
 
 .template-editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 1rem;
   border-bottom: 1px solid #eee;
 }

@@ -57,9 +57,20 @@ export function useLocalStorage() {
   }, []);
 
   const saveTemplate = useCallback((template: Template) => {
-    const updatedTemplates = templates.filter(t => t.id !== template.id);
-    updatedTemplates.push(template);
+    const existingIndex = templates.findIndex(t => t.id === template.id);
+    
+    let updatedTemplates: Template[];
+    if (existingIndex !== -1) {
+      // Update existing template in place
+      updatedTemplates = [...templates];
+      updatedTemplates[existingIndex] = template;
+    } else {
+      // Add new template
+      updatedTemplates = [...templates, template];
+    }
+    
     saveTemplates(updatedTemplates);
+    return true;
   }, [templates, saveTemplates]);
 
   const deleteTemplate = useCallback((templateId: string) => {

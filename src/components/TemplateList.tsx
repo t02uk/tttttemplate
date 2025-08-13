@@ -8,6 +8,7 @@ interface TemplateListProps {
   onDeleteTemplate: (templateId: string) => void;
   onNewTemplate: () => void;
   onUpdateTemplate: (template: Template) => void;
+  onMaximizeTemplate?: (template: Template) => void;
 }
 
 export function TemplateList({ 
@@ -16,7 +17,8 @@ export function TemplateList({
   onSelectTemplate, 
   onDeleteTemplate, 
   onNewTemplate,
-  onUpdateTemplate
+  onUpdateTemplate,
+  onMaximizeTemplate
 }: TemplateListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
@@ -84,23 +86,31 @@ export function TemplateList({
                 ) : (
                   <h4 onClick={(e) => handleStartEdit(template, e)}>{template.name}</h4>
                 )}
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteTemplate(template.id);
-                  }}
-                  className="delete-btn"
-                >
-                  ×
-                </button>
-              </div>
-              <div className="template-item-meta">
-                <span className="template-date">
-                  {new Date(template.updatedAt).toLocaleDateString()}
-                </span>
-                <span className="template-vars">
-                  {template.variables.length} variables
-                </span>
+                <div className="template-item-actions">
+                  {onMaximizeTemplate && (
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMaximizeTemplate(template);
+                      }}
+                      className="maximize-btn"
+                      title="Show in 2-pane view"
+                    >
+                      ⤢
+                    </button>
+                  )}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`Are you sure you want to delete "${template.name}"?`)) {
+                        onDeleteTemplate(template.id);
+                      }
+                    }}
+                    className="delete-btn"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
             </div>
           ))
