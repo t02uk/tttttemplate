@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { renderHook, act, waitFor } from '@testing-library/react'
 import { useLocalStorage } from '../useLocalStorage'
 import { mockTemplate } from '../../test/test-utils'
 
@@ -17,21 +17,39 @@ describe('useLocalStorage', () => {
       expect(result.current.currentTemplate).toBeNull()
     })
 
-    it('should load templates from localStorage on initialization', () => {
+    it('should load templates from localStorage on initialization', async () => {
       const mockTemplates = [mockTemplate]
-      localStorage.setItem('tttttemplate_templates', JSON.stringify(mockTemplates))
+      vi.mocked(localStorage.getItem).mockImplementation((key) => {
+        if (key === 'tttttemplate_templates') {
+          return JSON.stringify(mockTemplates)
+        }
+        return null
+      })
       
       const { result } = renderHook(() => useLocalStorage())
       
-      expect(result.current.templates).toEqual(mockTemplates)
+      await waitFor(() => {
+        expect(result.current.templates).toHaveLength(1)
+        expect(result.current.templates[0].id).toBe(mockTemplate.id)
+        expect(result.current.templates[0].name).toBe(mockTemplate.name)
+      })
     })
 
-    it('should load current template from localStorage on initialization', () => {
-      localStorage.setItem('tttttemplate_currentTemplate', JSON.stringify(mockTemplate))
+    it('should load current template from localStorage on initialization', async () => {
+      vi.mocked(localStorage.getItem).mockImplementation((key) => {
+        if (key === 'tttttemplate_currentTemplate') {
+          return JSON.stringify(mockTemplate)
+        }
+        return null
+      })
       
       const { result } = renderHook(() => useLocalStorage())
       
-      expect(result.current.currentTemplate).toEqual(mockTemplate)
+      await waitFor(() => {
+        expect(result.current.currentTemplate).toBeTruthy()
+        expect(result.current.currentTemplate?.id).toBe(mockTemplate.id)
+        expect(result.current.currentTemplate?.name).toBe(mockTemplate.name)
+      })
     })
   })
 

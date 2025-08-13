@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Template } from '../types/template';
 
+// App-specific prefix to avoid conflicts on shared domains like GitHub Pages
+const APP_PREFIX = 'tttttemplate';
+const TEMPLATES_KEY = `${APP_PREFIX}_templates`;
+const CURRENT_TEMPLATE_KEY = `${APP_PREFIX}_currentTemplate`;
+
 export function useLocalStorage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
-
-  // App-specific prefix to avoid conflicts on shared domains like GitHub Pages
-  const APP_PREFIX = 'tttttemplate';
-  const TEMPLATES_KEY = `${APP_PREFIX}_templates`;
-  const CURRENT_TEMPLATE_KEY = `${APP_PREFIX}_currentTemplate`;
 
   const loadTemplates = useCallback(() => {
     try {
