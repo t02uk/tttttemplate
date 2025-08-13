@@ -5,9 +5,14 @@ export function useLocalStorage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
 
+  // App-specific prefix to avoid conflicts on shared domains like GitHub Pages
+  const APP_PREFIX = 'tttttemplate';
+  const TEMPLATES_KEY = `${APP_PREFIX}_templates`;
+  const CURRENT_TEMPLATE_KEY = `${APP_PREFIX}_currentTemplate`;
+
   const loadTemplates = useCallback(() => {
     try {
-      const stored = localStorage.getItem('templates');
+      const stored = localStorage.getItem(TEMPLATES_KEY);
       if (stored) {
         const parsedTemplates = JSON.parse(stored);
         setTemplates(parsedTemplates);
@@ -19,7 +24,7 @@ export function useLocalStorage() {
 
   const saveTemplates = useCallback((templatesData: Template[]) => {
     try {
-      localStorage.setItem('templates', JSON.stringify(templatesData));
+      localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templatesData));
       setTemplates(templatesData);
     } catch (error) {
       console.error('Error saving templates:', error);
@@ -29,9 +34,9 @@ export function useLocalStorage() {
   const saveCurrentTemplate = useCallback((template: Template | null) => {
     try {
       if (template) {
-        localStorage.setItem('currentTemplate', JSON.stringify(template));
+        localStorage.setItem(CURRENT_TEMPLATE_KEY, JSON.stringify(template));
       } else {
-        localStorage.removeItem('currentTemplate');
+        localStorage.removeItem(CURRENT_TEMPLATE_KEY);
       }
       setCurrentTemplate(template);
     } catch (error) {
@@ -41,7 +46,7 @@ export function useLocalStorage() {
 
   const loadCurrentTemplate = useCallback(() => {
     try {
-      const stored = localStorage.getItem('currentTemplate');
+      const stored = localStorage.getItem(CURRENT_TEMPLATE_KEY);
       if (stored) {
         const parsedTemplate = JSON.parse(stored);
         setCurrentTemplate(parsedTemplate);
@@ -63,7 +68,7 @@ export function useLocalStorage() {
     
     if (currentTemplate?.id === templateId) {
       setCurrentTemplate(null);
-      localStorage.removeItem('currentTemplate');
+      localStorage.removeItem(CURRENT_TEMPLATE_KEY);
     }
   }, [templates, currentTemplate, saveTemplates]);
 

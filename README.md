@@ -13,7 +13,7 @@ A dynamic template engine application built with React + TypeScript + Vite that 
 - **Multiple Input Types**: Text, Number, Date, Radio buttons, Select dropdowns, Checkboxes
 - **Natural Language Date Processing**: Supports "tomorrow", "next Monday", "today + 3 days", etc.
 - **Real-time Preview**: Live template rendering with Handlebars.js
-- **Local Storage**: Automatic saving and loading of templates
+- **Local Storage**: Automatic saving and loading of templates with domain isolation
 - **Type-based UI Generation**: Automatic UI element creation based on function return types
 
 ## 🚀 UI Type Detection
@@ -111,6 +111,15 @@ new Date().toLocaleDateString();
 ## 🚀 Deployment
 
 This project is automatically deployed to GitHub Pages using GitHub Actions. Every push to the main branch triggers a new deployment.
+
+### LocalStorage Domain Isolation
+
+To prevent data conflicts between different GitHub Pages projects (which share the same `username.github.io` domain), this application uses app-specific prefixes for LocalStorage keys:
+
+- Templates: `tttttemplate_templates`
+- Current Template: `tttttemplate_currentTemplate`
+
+This ensures that template data is isolated from other projects deployed on the same GitHub Pages domain.
 
 ## 📄 License
 

@@ -19,7 +19,7 @@ describe('useLocalStorage', () => {
 
     it('should load templates from localStorage on initialization', () => {
       const mockTemplates = [mockTemplate]
-      localStorage.setItem('templates', JSON.stringify(mockTemplates))
+      localStorage.setItem('tttttemplate_templates', JSON.stringify(mockTemplates))
       
       const { result } = renderHook(() => useLocalStorage())
       
@@ -27,7 +27,7 @@ describe('useLocalStorage', () => {
     })
 
     it('should load current template from localStorage on initialization', () => {
-      localStorage.setItem('currentTemplate', JSON.stringify(mockTemplate))
+      localStorage.setItem('tttttemplate_currentTemplate', JSON.stringify(mockTemplate))
       
       const { result } = renderHook(() => useLocalStorage())
       
@@ -44,7 +44,7 @@ describe('useLocalStorage', () => {
       })
       
       expect(result.current.templates).toContain(mockTemplate)
-      expect(localStorage.setItem).toHaveBeenCalledWith('templates', JSON.stringify([mockTemplate]))
+      expect(localStorage.setItem).toHaveBeenCalledWith('tttttemplate_templates', JSON.stringify([mockTemplate]))
     })
 
     it('should update existing template', () => {
@@ -112,7 +112,7 @@ describe('useLocalStorage', () => {
       })
       
       expect(result.current.currentTemplate).toEqual(mockTemplate)
-      expect(localStorage.setItem).toHaveBeenCalledWith('currentTemplate', JSON.stringify(mockTemplate))
+      expect(localStorage.setItem).toHaveBeenCalledWith('tttttemplate_currentTemplate', JSON.stringify(mockTemplate))
     })
 
     it('should clear current template when setting to null', () => {
@@ -131,7 +131,7 @@ describe('useLocalStorage', () => {
       })
       
       expect(result.current.currentTemplate).toBeNull()
-      expect(localStorage.removeItem).toHaveBeenCalledWith('currentTemplate')
+      expect(localStorage.removeItem).toHaveBeenCalledWith('tttttemplate_currentTemplate')
     })
   })
 
@@ -153,7 +153,7 @@ describe('useLocalStorage', () => {
     })
 
     it('should handle invalid JSON in localStorage', () => {
-      localStorage.setItem('templates', 'invalid json')
+      localStorage.setItem('tttttemplate_templates', 'invalid json')
       
       const { result } = renderHook(() => useLocalStorage())
       
