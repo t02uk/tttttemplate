@@ -10,6 +10,7 @@ describe('TemplateList', () => {
     onSelectTemplate: vi.fn(),
     onDeleteTemplate: vi.fn(),
     onNewTemplate: vi.fn(),
+    onUpdateTemplate: vi.fn(),
   }
 
   beforeEach(() => {
