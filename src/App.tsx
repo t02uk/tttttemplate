@@ -141,6 +141,7 @@ function App() {
               onSelectTemplate={handleSelectTemplate}
               onDeleteTemplate={deleteTemplate}
               onNewTemplate={handleNewTemplate}
+              onUpdateTemplate={saveTemplate}
             />
           </div>
 

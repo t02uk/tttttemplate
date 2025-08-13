@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Template } from '../types/template';
 
 interface TemplateListProps {
@@ -6,6 +7,7 @@ interface TemplateListProps {
   onSelectTemplate: (template: Template) => void;
   onDeleteTemplate: (templateId: string) => void;
   onNewTemplate: () => void;
+  onUpdateTemplate: (template: Template) => void;
 }
 
 export function TemplateList({ 
@@ -13,8 +15,43 @@ export function TemplateList({
   currentTemplate, 
   onSelectTemplate, 
   onDeleteTemplate, 
-  onNewTemplate 
+  onNewTemplate,
+  onUpdateTemplate
 }: TemplateListProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState<string>('');
+
+  const handleStartEdit = (template: Template, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingId(template.id);
+    setEditingName(template.name);
+  };
+
+  const handleSaveEdit = (template: Template) => {
+    if (editingName.trim() && editingName !== template.name) {
+      const updatedTemplate = {
+        ...template,
+        name: editingName.trim(),
+        updatedAt: new Date()
+      };
+      onUpdateTemplate(updatedTemplate);
+    }
+    setEditingId(null);
+    setEditingName('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditingName('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, template: Template) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit(template);
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
   return (
     <div className="template-list">
       <div className="template-list-header">
@@ -34,7 +71,19 @@ export function TemplateList({
               onClick={() => onSelectTemplate(template)}
             >
               <div className="template-item-header">
-                <h4>{template.name}</h4>
+                {editingId === template.id ? (
+                  <input
+                    type="text"
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    onBlur={() => handleSaveEdit(template)}
+                    onKeyDown={(e) => handleKeyDown(e, template)}
+                    className="template-name-input"
+                    autoFocus
+                  />
+                ) : (
+                  <h4 onClick={(e) => handleStartEdit(template, e)}>{template.name}</h4>
+                )}
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
